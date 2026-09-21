@@ -1,12 +1,12 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { PRODUCTOS_MOCK } from '@/lib/mockProductos';
+import { CATALOGO_LOCAL } from '@/lib/mockProductos';
 import { useDebounce } from './useDebounce';
 
 function buscarEnMock(consulta) {
   const q = consulta.toLowerCase();
-  return PRODUCTOS_MOCK
+  return CATALOGO_LOCAL
     .filter((p) => p.disponible)
     .filter((p) => p.nombre.toLowerCase().includes(q) || p.categoria.toLowerCase().includes(q))
     .slice(0, 8);

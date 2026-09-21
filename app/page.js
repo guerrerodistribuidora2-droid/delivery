@@ -3,17 +3,17 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ShoppingBag, Star, Clock, MapPin, ArrowRight } from 'lucide-react';
 import { useCarrito } from '@/components/carrito/CarritoContext';
-import { PRODUCTOS_MOCK } from '@/lib/mockProductos';
+import { CATALOGO_LOCAL } from '@/lib/mockProductos';
 import ImagenConFallback from '@/components/menu/ImagenConFallback';
 
 export default function Home() {
   const { agregarProducto } = useCarrito();
   const [categoriaActiva, setCategoriaActiva] = useState('Todas');
 
-  const categorias = useMemo(() => ['Todas', ...new Set(PRODUCTOS_MOCK.map((p) => p.categoria))], []);
+  const categorias = useMemo(() => ['Todas', ...new Set(CATALOGO_LOCAL.map((p) => p.categoria))], []);
 
   const platillosFiltrados = useMemo(() => {
-    const disponibles = PRODUCTOS_MOCK.filter((p) => p.disponible);
+    const disponibles = CATALOGO_LOCAL.filter((p) => p.disponible);
     return categoriaActiva === 'Todas' ? disponibles : disponibles.filter((p) => p.categoria === categoriaActiva);
   }, [categoriaActiva]);
 
@@ -51,13 +51,35 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="relative flex justify-center">
+          <div className="relative flex justify-center pb-6 pt-4 lg:py-8">
             <div className="relative aspect-square w-full max-w-md overflow-hidden rounded-3xl border-4 border-white bg-cultured shadow-2xl">
               <img
                 src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop&q=80"
                 alt="Plato destacado"
                 className="h-full w-full object-cover"
               />
+            </div>
+
+            {/* Insignia flotante: calificación */}
+            <div className="absolute -left-2 top-2 flex items-center gap-2.5 rounded-2xl bg-white px-4 py-3 shadow-card-2 sm:-left-6 sm:top-8">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-deep-saffron/10 text-deep-saffron">
+                <Star className="h-5 w-5 fill-deep-saffron" />
+              </span>
+              <div className="text-left">
+                <p className="font-heading text-sm font-bold leading-tight text-rich-black">4.9 / 5.0</p>
+                <p className="text-[11px] text-spanish-gray">+2,000 reseñas</p>
+              </div>
+            </div>
+
+            {/* Insignia flotante: horario / tiempo de entrega */}
+            <div className="absolute -right-2 bottom-2 flex items-center gap-2.5 rounded-2xl bg-white px-4 py-3 shadow-card-2 sm:-right-6 sm:bottom-8">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                <Clock className="h-5 w-5" />
+              </span>
+              <div className="text-left">
+                <p className="font-heading text-sm font-bold leading-tight text-rich-black">Abierto ahora</p>
+                <p className="text-[11px] text-spanish-gray">Entrega en 25-35 min</p>
+              </div>
             </div>
           </div>
         </div>
@@ -119,13 +141,23 @@ export default function Home() {
                   <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-rich-black shadow-sm backdrop-blur-sm">
                     {producto.categoria}
                   </span>
+                  {producto.precio_original && (
+                    <span className="absolute right-4 top-4 rounded-full bg-cinnabar px-3 py-1 text-xs font-bold text-white shadow-sm">
+                      -{Math.round((1 - producto.precio / producto.precio_original) * 100)}% OFF
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex flex-1 flex-col justify-between p-6">
                   <div>
-                    <div className="mb-2 flex items-start justify-between">
+                    <div className="mb-2 flex items-start justify-between gap-2">
                       <h3 className="font-heading text-lg font-bold text-rich-black">{producto.nombre}</h3>
-                      <span className="font-heading text-lg font-bold text-deep-saffron">${producto.precio.toFixed(2)}</span>
+                      <div className="flex shrink-0 items-baseline gap-1.5">
+                        <span className="font-heading text-lg font-bold text-deep-saffron">${producto.precio.toFixed(2)}</span>
+                        {producto.precio_original && (
+                          <span className="text-xs text-spanish-gray line-through">${producto.precio_original.toFixed(2)}</span>
+                        )}
+                      </div>
                     </div>
                     <p className="mb-4 line-clamp-2 text-xs text-spanish-gray sm:text-sm">{producto.descripcion}</p>
                   </div>
